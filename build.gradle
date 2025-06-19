@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'signing'
+    id 'org.jreleaser' version '1.17.0'
+}
+
+group = 'com.kyfstore'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation 'com.google.code.gson:gson:2.13.1'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.kyfstore'
+            artifactId = 'tinystore'
+
+            from components.java
+
+            pom {
+                name = 'TinyStore'
+                description = 'TinyStore is a lightweight Java key-value storage API designed for simple, type-safe local persistence with JSON and binary support. It features versioned APIs and extensible metadata, making it easy to manage small config or runtime data efficiently.'
+                url = 'https://github.com/KyfStore11k/TinyStore'
+                inceptionYear = '2025'
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://opensource.org/license/mit'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'KyfStore11k'
+                        name = 'Kyle Fwi'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/KyfStore11k/TinyStore.git'
+                    developerConnection = 'scm:git:ssh://github.com/KyfStore11k/TinyStore.git'
+                    url = 'http://github.com/KyfStore11k/TinyStore'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.maven
+}
+
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+}
