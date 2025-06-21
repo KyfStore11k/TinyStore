@@ -2,11 +2,11 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'signing'
-    id 'org.jreleaser' version '1.17.0'
+    id 'org.jreleaser' version '1.18.0'
 }
 
 group = 'com.kyfstore'
-version = '1.0-SNAPSHOT'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -80,6 +80,7 @@ jreleaser {
         active = 'ALWAYS'
         armored = true
     }
+    gitRootSearch = true
     deploy {
         maven {
             mavenCentral {
@@ -87,6 +88,12 @@ jreleaser {
                     active = 'ALWAYS'
                     url = 'https://central.sonatype.com/api/v1/publisher'
                     stagingRepository('build/staging-deploy')
+
+                    snapshotSupported = true
+
+                    username = '__USE_ENVIRONMENT_VARIABLE__'
+                    password = '__USE_ENVIRONMENT_VARIABLE__'
+                    authorization = "BEARER"
                 }
             }
         }
